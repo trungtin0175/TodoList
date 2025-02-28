@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Todo from "./pages/TodoList";
-import About from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import "./App.css";
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Todo />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
