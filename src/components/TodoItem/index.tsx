@@ -19,7 +19,7 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
   };
   const handleUpdateStatus = async (status: TaskStatus) => {
     try {
-      const updatedTask = await updateTask({ ...task, status }, task?.id);
+      const updatedTask = await updateTask({ ...task, status }, task?.id ?? 0);
       setTask(updatedTask);
       setIsOpenMenu(false);
     } catch (error) {
@@ -28,14 +28,13 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
   };
   const handleDeleteTask = async () => {
     try {
-      const updatedTask = await deleteTask(task?.id);
+      const updatedTask = await deleteTask(task?.id ?? 0);
       setTask(updatedTask);
       setIsOpenMenu(false);
     } catch (error) {
       console.error(error);
     }
   };
-  console.log(data);
   return (
     <>
       <div
@@ -49,7 +48,15 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
         }`}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-center flex-1 justify-center text-[#6495ED] py-2 font-semibold">
+          <h3
+            className={`text-center px-2 flex-1 truncate justify-center ${
+              data?.status === 1
+                ? "text-yellow-400"
+                : data?.status === 2
+                ? "text-green-500"
+                : "text-[#6495ED]"
+            } py-2 font-semibold`}
+          >
             {data?.title}
           </h3>
           <div
@@ -71,7 +78,7 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
                     onClick={() => handleUpdateStatus(TaskStatus.Todo)}
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
                   >
-                    <div className="w-3 h-3 rounded-full bg-red-500 me-2"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#6495ED] me-2"></div>
                     <p>Todo</p>
                   </li>
                   <li
@@ -95,7 +102,7 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
                     <img
                       alt="delete"
                       src={deleteIcon}
-                      className="w-4 cursor-pointer me-2"
+                      className="w-4 cursor-pointer me-1"
                     />
                     Delete
                   </li>
@@ -104,8 +111,16 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
             )}
           </div>
         </div>
-        <div className="w-full h-[2px] bg-[#6495ED]"></div>
-        <div className="max-h-[400px] overflow-y-scroll">
+        <div
+          className={`w-full h-[2px] ${
+            data?.status === 1
+              ? "bg-yellow-400"
+              : data?.status === 2
+              ? "bg-green-500"
+              : "bg-[#6495ED]"
+          }`}
+        ></div>
+        <div className="max-h-[400px] overflow-hidden">
           {Array.isArray(data?.subTasks) &&
             data?.subTasks?.length > 0 &&
             data?.subTasks?.map((item) => (

@@ -12,7 +12,7 @@ export interface Subtask {
 }
 
 export interface Task {
-  id: string;
+  id?: number;
   title: string;
   status: TaskStatus;
   dueDate: string;

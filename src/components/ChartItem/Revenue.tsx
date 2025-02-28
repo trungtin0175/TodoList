@@ -7,19 +7,15 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import { RevenueType } from "../../interfaces/Dashboard";
 
-const data = [
-  { year: 2021, amount: 150000 },
-  { year: 2022, amount: 180000 },
-  { year: 2023, amount: 210000 },
-  { year: 2024, amount: 250000 },
-  { year: 2025, amount: 300000 },
-];
+interface ItemProps {
+  data: RevenueType[];
+}
 
-const Revenue = () => {
+const Revenue: React.FC<ItemProps> = ({ data }) => {
   return (
-    <div className="bg-white p-4 rounded">
-      <h2 className="text-lg font-semibold mb-3">Doanh thu công ty (5 năm)</h2>
+    <div className="bg-white p-4 rounded md:w-[50%] w-full">
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -29,6 +25,9 @@ const Revenue = () => {
           <Bar dataKey="amount" fill="#3b82f6" />
         </BarChart>
       </ResponsiveContainer>
+      <h2 className="text-lg font-semibold mt-3 text-center">
+        Doanh thu công ty (5 năm)
+      </h2>
     </div>
   );
 };
