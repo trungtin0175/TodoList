@@ -27,7 +27,7 @@ export const createTask = async (task: Task) => {
   }
 };
 
-export const updateTask = async (task: Task, id: string) => {
+export const updateTask = async (task: Task, id: number) => {
   try {
     const response = await axios.put(
       `https://65f7b579b4f842e80885e0ef.mockapi.io/tasks/${id}`,
@@ -42,7 +42,7 @@ export const updateTask = async (task: Task, id: string) => {
   }
 };
 
-export const deleteTask = async (id: string) => {
+export const deleteTask = async (id: number) => {
   try {
     const response = await axios.delete(
       `https://65f7b579b4f842e80885e0ef.mockapi.io/tasks/${id}`
