@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Subtask, Task } from "../../interfaces/Task";
 import { createTask, updateTask } from "../../services/taskService";
+import {
+  getStatusBgColor,
+  getStatusBorderColor,
+  getStatusTextColor,
+} from "../../utils/helper";
+
 import closeIcon from "../../assets/icons/close.svg";
 import deleteIcon from "../../assets/icons/delete.svg";
 import plusIcon from "../../assets/icons/plus.svg";
@@ -10,16 +16,21 @@ interface Props {
   isOpenModal: boolean;
   onClose: () => void;
   data: Task;
+  refreshTasks: () => void;
 }
 
-const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
+const ModalTodo = ({ isOpenModal, onClose, data, refreshTasks }: Props) => {
   const [taskTitle, setTaskTitle] = useState<string>(data?.title);
   const [subTasks, setSubTasks] = useState<Subtask[]>(data?.subTasks || []);
+
+  //Hàm thay đổi nội dung của item trong Subtask
   const handleSubtaskChange = (id: number, newValue: string) => {
     setSubTasks((prev) =>
       prev.map((item) => (item.id === id ? { ...item, value: newValue } : item))
     );
   };
+
+  //Hàm thay đổi trạng thái của item trong Subtask
   const handleToggleSubtask = (id: number) => {
     setSubTasks((prev) =>
       prev.map((item) =>
@@ -27,9 +38,13 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
       )
     );
   };
+
+  //Hàm xóa item trong Subtask
   const handleDeleteSubtask = (id: number) => {
     setSubTasks(subTasks.filter((subtask) => subtask.id !== id));
   };
+
+  //Hàm tạo mới item trong Subtask
   const handleAddItemSubtask = () => {
     const newSubtask: Subtask = {
       id: subTasks.length + 1,
@@ -38,6 +53,8 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
     };
     setSubTasks([...subTasks, newSubtask]);
   };
+
+  //Hàm lưu lại Task sau khi thay đổi
   const handleSave = async () => {
     const updatedTask: Task = {
       ...data,
@@ -56,6 +73,7 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
       } else {
         await updateTask(updatedTask, data?.id ?? 0);
       }
+      refreshTasks();
       onClose();
     } catch (error) {
       console.error(error);
@@ -73,26 +91,18 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative overflow-hidden max-w-[500px] min-w-[300px] min-h-[300px] rounded-2xl bg-white border-2 ${
-          data?.status === 1
-            ? "border-yellow-400"
-            : data?.status === 2
-            ? "border-green-500"
-            : "border-[#6495ED]"
-        }`}
+        className={`relative overflow-hidden max-w-[500px] min-w-[300px] min-h-[300px] rounded-2xl bg-white border-2 ${getStatusBorderColor(
+          data?.status
+        )}`}
       >
         <div className="flex items-center justify-between">
           <input
             type="text"
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
-            className={`text-center flex-1 justify-center ${
-              data?.status === 1
-                ? "text-yellow-400"
-                : data?.status === 2
-                ? "text-green-500"
-                : "text-[#6495ED]"
-            } p-2 font-semibold border-b border-gray-300 outline-none`}
+            className={`text-center flex-1 justify-center ${getStatusTextColor(
+              data?.status
+            )} p-2 font-semibold border-b border-gray-300 outline-none`}
           />
 
           <div onClick={onClose}>
@@ -104,72 +114,27 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
           </div>
         </div>
         <div
-          className={`w-full h-[2px] ${
-            data?.status === 1
-              ? "bg-yellow-400"
-              : data?.status === 2
-              ? "bg-green-500"
-              : "bg-[#6495ED]"
-          }`}
+          className={`w-full h-[2px] ${getStatusBgColor(data?.status)}`}
         ></div>
         <div>
-          {/* <div className="flex items-start px-1 py-2">
-            <input type="checkbox" className="mt-2" />
-            <p className="text-gray-700 ms-2">
-              sdfgb skgjsdf sdfbg jsdfjksd jks djkhgsd bdjskg k
-            </p>
-            <img
-              alt="delete"
-              src={deleteIcon}
-              className="w-4 cursor-pointer me-3"
-            ></img>
-          </div> */}
-          {/* {subTasks.map((subtask) => (
-            <div key={subtask.id} className="flex items-center px-1 py-2">
-              <input
-                type="checkbox"
-                checked={subtask.completed}
-                className="mt-2"
-              />
-              <input
-                type="text"
-                value={subtask?.value}
-                onChange={(e) =>
-                  handleSubtaskChange(subtask.id, e.target.value)
-                }
-                className="text-gray-700 ms-2 border-b border-gray-300 outline-none w-full"
-              />
-              <img
-                alt="delete"
-                src={deleteIcon}
-                className="w-4 cursor-pointer me-3"
-              />
-            </div>
-          ))} */}
           {Array.isArray(subTasks) &&
             subTasks.length > 0 &&
             subTasks.map((subtaskItem) => (
-              <div key={subtaskItem.id} className="flex items-center px-1 py-2">
+              <div
+                key={subtaskItem?.id}
+                className="flex items-center px-1 py-2"
+              >
                 <input
                   type="checkbox"
-                  checked={subtaskItem.completed}
-                  onChange={() => handleToggleSubtask(subtaskItem.id)}
-                  // onChange={() =>
-                  //   setSubTasks((prev) =>
-                  //     prev.map((item) =>
-                  //       item.id === subtaskItem.id
-                  //         ? { ...item, completed: !item.completed }
-                  //         : item
-                  //     )
-                  //   )
-                  // }
+                  checked={subtaskItem?.completed}
+                  onChange={() => handleToggleSubtask(subtaskItem?.id)}
                   className="mt-2"
                 />
                 <input
                   type="text"
-                  value={subtaskItem.value}
+                  value={subtaskItem?.value}
                   onChange={(e) =>
-                    handleSubtaskChange(subtaskItem.id, e.target.value)
+                    handleSubtaskChange(subtaskItem?.id, e.target.value)
                   }
                   className="text-gray-700 ms-2 border-b border-gray-300 outline-none w-full"
                 />
@@ -177,7 +142,7 @@ const ModalTodo = ({ isOpenModal, onClose, data }: Props) => {
                   alt="delete"
                   src={deleteIcon}
                   className="w-6 cursor-pointer ms-3"
-                  onClick={() => handleDeleteSubtask(subtaskItem.id)}
+                  onClick={() => handleDeleteSubtask(subtaskItem?.id)}
                 />
               </div>
             ))}

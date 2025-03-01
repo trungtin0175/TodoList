@@ -26,7 +26,7 @@ const Revenue: React.FC<ItemProps> = ({ data }) => {
         </BarChart>
       </ResponsiveContainer>
       <h2 className="text-lg font-semibold mt-3 text-center">
-        Doanh thu công ty (5 năm)
+        Company revenue (5 years)
       </h2>
     </div>
   );

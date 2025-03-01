@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Task } from "../interfaces/Task";
 
+//api lấy danh sách Task
 export const getListTasks = async () => {
   try {
     const response = await axios.get(
@@ -12,6 +13,7 @@ export const getListTasks = async () => {
   }
 };
 
+//api tạo Task mới
 export const createTask = async (task: Task) => {
   try {
     const response = await axios.post(
@@ -27,6 +29,7 @@ export const createTask = async (task: Task) => {
   }
 };
 
+//api update Task
 export const updateTask = async (task: Task, id: number) => {
   try {
     const response = await axios.put(
@@ -42,6 +45,7 @@ export const updateTask = async (task: Task, id: number) => {
   }
 };
 
+//api xóa Task
 export const deleteTask = async (id: number) => {
   try {
     const response = await axios.delete(
