@@ -1,5 +1,6 @@
 import axios from "axios";
 
+//api lấy data của dashboard
 export const getDashboard = async () => {
   try {
     const response = await axios.get(

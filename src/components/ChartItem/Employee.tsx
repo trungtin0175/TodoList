@@ -31,7 +31,7 @@ const Employee: React.FC<ItemProps> = ({ data }) => {
         </LineChart>
       </ResponsiveContainer>
       <h2 className="text-lg font-semibold mt-3 text-center">
-        Số lượng nhân viên (24 tháng)
+        Number of employees (24 months)
       </h2>
     </div>
   );

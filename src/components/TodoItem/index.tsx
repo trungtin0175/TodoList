@@ -2,60 +2,67 @@ import { useState } from "react";
 import { Task, TaskStatus } from "../../interfaces/Task";
 import { deleteTask, updateTask } from "../../services/taskService";
 import ModalTodo from "./ModalTodo";
+import {
+  getStatusBgColor,
+  getStatusBorderColor,
+  getStatusTextColor,
+} from "../../utils/helper";
+
 import dotsIcon from "../../assets/icons/dots.svg";
 import deleteIcon from "../../assets/icons/delete.svg";
 
 interface ItemProps {
   data: Task;
+  refreshTasks: () => void;
 }
 
-const TodoItem: React.FC<ItemProps> = ({ data }) => {
+const TodoItem: React.FC<ItemProps> = ({ data, refreshTasks }) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
   const [task, setTask] = useState<Task>(data);
 
+  //Hàm đóng modal
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
+
+  //Hàm thay đổi trạng thái của Task
   const handleUpdateStatus = async (status: TaskStatus) => {
     try {
       const updatedTask = await updateTask({ ...task, status }, task?.id ?? 0);
       setTask(updatedTask);
       setIsOpenMenu(false);
+      refreshTasks();
     } catch (error) {
       console.error(error);
     }
   };
+
+  //Hàm xóa Task
   const handleDeleteTask = async () => {
     try {
       const updatedTask = await deleteTask(task?.id ?? 0);
       setTask(updatedTask);
       setIsOpenMenu(false);
+      refreshTasks();
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
     <>
       <div
         onClick={() => setIsOpenModal(true)}
-        className={`cursor-pointer w-[200px] min-h-[300px] rounded-2xl bg-white border-2 overflow-hidden ${
-          data?.status === 1
-            ? "border-yellow-400"
-            : data?.status === 2
-            ? "border-green-500"
-            : "border-[#6495ED]"
-        }`}
+        className={`relative cursor-pointer w-[200px] min-h-[300px] rounded-2xl bg-white border-2 overflow-hidden ${getStatusBorderColor(
+          data?.status
+        )}`}
       >
         <div className="flex items-center justify-between">
           <h3
-            className={`text-center px-2 flex-1 truncate justify-center ${
-              data?.status === 1
-                ? "text-yellow-400"
-                : data?.status === 2
-                ? "text-green-500"
-                : "text-[#6495ED]"
-            } py-2 font-semibold`}
+            className={`text-center px-2 flex-1 truncate justify-center ${getStatusTextColor(
+              data?.status
+            )} py-2 font-semibold`}
           >
             {data?.title}
           </h3>
@@ -112,13 +119,7 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
           </div>
         </div>
         <div
-          className={`w-full h-[2px] ${
-            data?.status === 1
-              ? "bg-yellow-400"
-              : data?.status === 2
-              ? "bg-green-500"
-              : "bg-[#6495ED]"
-          }`}
+          className={`w-full h-[2px] ${getStatusBgColor(data?.status)}`}
         ></div>
         <div className="max-h-[400px] overflow-hidden">
           {Array.isArray(data?.subTasks) &&
@@ -140,6 +141,7 @@ const TodoItem: React.FC<ItemProps> = ({ data }) => {
           onClose={handleCloseModal}
           isOpenModal={isOpenModal}
           data={data}
+          refreshTasks={refreshTasks}
         />
       )}
     </>
