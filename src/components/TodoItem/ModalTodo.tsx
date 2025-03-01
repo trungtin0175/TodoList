@@ -22,6 +22,7 @@ interface Props {
 const ModalTodo = ({ isOpenModal, onClose, data, refreshTasks }: Props) => {
   const [taskTitle, setTaskTitle] = useState<string>(data?.title);
   const [subTasks, setSubTasks] = useState<Subtask[]>(data?.subTasks || []);
+  const [isSave, setIsSave] = useState<boolean>(false);
 
   //Hàm thay đổi nội dung của item trong Subtask
   const handleSubtaskChange = (id: number, newValue: string) => {
@@ -56,17 +57,24 @@ const ModalTodo = ({ isOpenModal, onClose, data, refreshTasks }: Props) => {
 
   //Hàm lưu lại Task sau khi thay đổi
   const handleSave = async () => {
+    if (isSave) {
+      return;
+    }
+
+    setIsSave(true);
     const updatedTask: Task = {
       ...data,
       title: taskTitle,
       subTasks: subTasks,
     };
+
     const newTask: Task = {
       title: taskTitle,
       status: 0,
       dueDate: new Date().toISOString(),
       subTasks: subTasks,
     };
+
     try {
       if (data?.id === 0) {
         await createTask(newTask);
@@ -74,9 +82,11 @@ const ModalTodo = ({ isOpenModal, onClose, data, refreshTasks }: Props) => {
         await updateTask(updatedTask, data?.id ?? 0);
       }
       refreshTasks();
+      setIsSave(false);
       onClose();
     } catch (error) {
       console.error(error);
+      setIsSave(false);
     }
   };
 
@@ -160,7 +170,7 @@ const ModalTodo = ({ isOpenModal, onClose, data, refreshTasks }: Props) => {
             className="flex items-center cursor-pointer mx-2 bg-[#3CB371]"
           >
             <img alt="plus" src={saveIcon} className="me-2 w-5"></img>
-            Save
+            {isSave ? "Loading.." : "Save"}
           </button>
         </div>
       </div>
